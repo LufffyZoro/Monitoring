@@ -1,0 +1,148 @@
+version: '3'
+services:
+  database:
+    image: timescale/timescaledb:latest-pg10
+    container_name: my_postgres_database2
+    restart: always
+    volumes:
+        - ./data:/var/lib/postgresql/data
+    ports:
+      - "0.0.0.0:5432:5432"
+#    env_file:
+#      - ./postgresql.conf
+#      - ./pg_hba.conf
+    environment:
+      - 'POSTGRES_PASSWORD=i2i@1234'
+      - 'POSTGRES_DB=my_default_database'
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+version: "3"
+services:
+  db:
+    image: timescale/timescaledb:latest-pg10
+    container_name: my_postgres_database1
+    restart: always
+    ports:
+      - "0.0.0.0:5432:5432"
+    environment:
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: postgresdb
+     networks:
+      - mynetwork
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  exporter:
+    image: wrouesnel/postgres_exporter
+    container_name: exporter1
+    restart: always
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:mypassword@db:5432/postgres?sslmode=disable"
+    ports:
+      - "9187:9187"
+    networks:
+      - kafka-exporter-network
+
+networks:
+  kafka-exporter-network:
+  
+ 
+
+
+
+postgres-exporter cli =  https://schh.medium.com/monitoring-postgresql-databases-using-postgres-exporter-along-with-prometheus-and-grafana-1d68209ca687
+
+
+
+Create DB =====
+create database iu_admin;
+create database iu_timeseries;
+Commands to create database user====
+create user iuprod with encrypted password 'admin123';
+
+### GRANT Permission Command ####
+\connect iu_admin
+grant all privileges on database iu_admin to iuprod;
+grant ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to iuprod;
+grant ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to iuprod;
+
+[07/25 3:01 PM] Yashwant Patil
+
+\connect iu_timeseries
+grant all privileges on database iu_timeseries to iuprod;
+grant ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to iuprod;
+grant ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to iuprod;
+
+
+You are connected to database "postgres" as user "postgres" via socket in "/var/run/postgresql" at port "5432"
+
+DATA_SOURCE_NAME="postgresql://username:password@localhost:5432/database-name?sslmode=disable"
+
+
+DATA_SOURCE_NAME="postgresql://iuprod:admin123@localhost:5432/iu_timeseries?sslmode=disable"
+
+
+
+
+
+
+version: '3'
+services:
+  database:
+    image: timescale/timescaledb:latest-pg10
+    container_name: my_postgres_database2
+    restart: always
+    volumes:
+      - ./data:/var/lib/postgresql/data
+         # - /data/database/data:/var/lib/postgresql/data
+    ports:
+      - "0.0.0.0:5432:5432"
+    env_file:
+      - ./postgresql.conf
+      - ./pg_hba.conf
+    environment:
+      - 'POSTGRES_PASSWORD=i2i@1234'
+      - 'POSTGRES_DB=my_default_database'
+
+        #exporter:
+        #image: wrouesnel/postgres_exporter
+        #container_name: exporter1
+        #restart: always
+        #environment:
+        #DATA_SOURCE_NAME: "postgresql://postgres:i2i@1234@database:5432/postgres?sslmode=disable"
+        #ports:
+        #- "9187:9187"
+		
+		
+		
+version: '3'
+services:
+  database:
+    image: timescale/timescaledb:latest-pg10
+    container_name: my_postgres_database2
+    restart: always
+    volumes:
+      - ./data:/var/lib/postgresql/data
+         # - /data/database/data:/var/lib/postgresql/data
+    ports:
+      - "0.0.0.0:5432:5432"
+    #env_file:
+    #  - ./postgresql.conf
+    #  - ./pg_hba.conf
+    #environment:
+      - 'POSTGRES_PASSWORD=i2i@1234'
+      - 'POSTGRES_DB=my_default_database'
+
+  exporter:
+    image: wrouesnel/postgres_exporter
+    container_name: exporter1
+    restart: always
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:i2i@1234@database:5432/postgres?sslmode=disable"
+    ports:
+      - "9187:9187"
