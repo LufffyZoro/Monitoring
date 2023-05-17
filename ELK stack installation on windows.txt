@@ -1,0 +1,160 @@
+
+
+
+             elasticsearch configuration on windows
+
+
+ 1 Download the elasticsearch Windows zip file from the downloads page.
+
+ 2 Extract the contents of the zip file into C:\elastic-stack
+
+ 3 open elasticsearch.yml file (ussing notepad or notpad++ as supported)
+
+   { EDIT-
+     Network.host: 0.0.0.0
+     http.port:9200
+     on last line type- discovery.type: single-node 
+    }
+           save & exit
+
+ 4 open comand prompt with administrator privalage
+ 
+ 5 cd C:\elastic-stack\elasticsearch-8.2.0-windows-x86_64\bin
+
+ 6 action.auto_create_index: .monitoring*,.watches,.triggered_watches,.watcher-history*,.ml* (to auto create index)
+
+ 7 .\bin\elasticsearch.bat
+
+ 8 then check on browser that elasticsearch is running or not at (http://localhost:9200)
+
+ 9 run the following comand on cmd(admin) to reset the default password
+
+ 10 bin/elasticsearch-setup-passwords interactive
+
+
+
+
+
+             kibana installation & configuration on windows
+
+
+ 1 Download the Kibana Windows zip file from the downloads page.
+
+ 2 Extract the contents of the zip file into C:\elastic-stack
+
+ 3 open kibana.yml file (ussing notepad or notpad++ as supported)
+
+   { EDIT-
+     uncoment srever port 
+     uncoment srevrhost & edit it to "0.0.0.0"
+     uncoment elasticsearch host
+     elasticsearch.username: "<kibana_system>"
+     elasticsearch.password: "<password>"
+   }
+           save & exit
+
+ 4 open comand prompt with administrator privalage
+
+ 5 cd C:\elastic-stack\kibana-8.2.0-windows-x86_64\bin
+
+ 6 .\bin\kibana.bat
+
+ 7 kibana must be rechable & running check it on browser at http://localhost:5601
+
+
+
+
+
+
+
+
+            file beat installation on windows
+
+
+ 1 Download the Filebeat Windows zip file from the downloads page.
+
+ 2 Extract the contents of the zip file into C:\Program Files.
+
+ 3 Rename the filebeat-<version>-windows directory to Filebeat.
+
+ 4 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select Run As Administrator).
+
+ 5 From the PowerShell prompt, run the following commands to install Filebeat as a Windows service:
+
+ 6 PS > cd 'C:\Program Files\Filebeat'
+
+ 7 PS C:\Program Files\filebeat> PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1 
+
+ 8 PS C:\Program Files\Filebeat> notepad.exe .\filebeat.yml
+
+    { enabled: true
+
+    EDIT SECTION KIBANA
+    #host:"localhost:5601"
+    uncomment this line and edit host: "private ip of server:5601"
+
+    EDIT SECTIN ELASTIC.OUTPUT
+    host: "private ip of server:9200"
+
+    SECTION-FILEBEAT MODULE
+    reload enabled: true   }
+
+
+ 9 PS > .\filebeat.exe modules list
+
+ 10 PS > .\filebeat.exe modules enable nginx
+
+ 11 PS C:\Program Files\Filebeat> cd .\modules.d\
+
+ 12 PS C:\Program Files\filebeat\modules.d> notepad.exe .\nginx.yml
+
+      { 
+        ["/var/log/nginx/access.log*"]  
+      }
+
+ 13 PS C:\Program Files\filebeat\modules.d> cd ..
+
+ 14 PS > .\filebeat.exe setup -e
+
+ 15 PS C:\Program Files\filebeat> Start-Service filebeat
+
+
+
+
+
+
+
+
+      installation of metricbeat on windows
+
+
+ 1 Download the Metricbeat Windows zip file from the downloads page.
+
+ 2 Extract the contents of the zip file into C:\Program Files.
+
+ 3 Rename the metricbeat-<version>-windows directory to Metricbeat.
+
+ 4 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select Run As Administrator).
+
+ 5 From the PowerShell prompt, run the following commands to install Metricbeat as a Windows service
+
+ 6 PS > cd 'C:\Program Files\Metricbeat'
+
+ 7 PS C:\Program Files\Metricbeat> PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-metricbeat.ps1
+
+ 8 PS C:\Program Files\metricbeat> notepad.exe .\metricbeat.yml
+
+   { EDIT SECTION KIBANA
+    #host:"localhost:5601"
+    uncomment this line and edit host: "private ip of server:5601"
+
+    EDIT SECTIN ELASTIC.OUTPUT
+    host: "private ip of server:9200" }
+ 
+ 9 PS > .\metricbeat.exe setup -e
+
+ 10 PS C:\Program Files\metricbeat> Start-Service metricbeat
+   
+
+
+
