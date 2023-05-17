@@ -1,0 +1,302 @@
+
+
+
+                                  Grafana Prometheus {Exporters}
+
+
+			* GRAFANA INSTALLATION ON UBUNTU SREVER
+
+	# sudo apt-get install -y apt-transport-https
+	
+	# sudo apt-get install -y software-properties-common wget
+	
+	# wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+
+	# echo "deb https://packages.grafana.com/enterprise/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+	
+	# sudo apt-get update
+	
+	# sudo apt-get install grafana-enterprise
+	
+	# sudo systemctl daemon-reload
+	
+	# sudo systemctl enable grafana-server.service
+	
+	# sudo systemctl start grafana-server
+	
+	# sudo systemctl status grafana-server
+	
+	# sudo lsof -i 
+
+##########################################################################################################################################################	
+
+
+                                               GRAFANA SMTP CONFIGURATIONS
+
+   EDIT => /etc/grafana/grafana.ini
+
+#################################### SMTP / Emailing ##########################
+[smtp]
+enabled = true
+host = smtp.office365.com:587
+user = nashik.monitoring@ideastoimpacts.com
+
+# If the password contains # or ; you have to wrap it with triple quotes. Ex """#password;"""
+password = """Grafana@321#"""
+;cert_file =
+;key_file =
+skip_verify = true
+from_address = nashik.monitoring@ideastoimpacts.com
+from_name = Grafana
+# EHLO identity in SMTP dialog (defaults to instance_name)
+;ehlo_identity = dashboard.example.com
+# SMTP startTLS policy (defaults to 'OpportunisticStartTLS')
+;startTLS_policy = NoStartTLS
+
+
+################################################################################################################################	
+			* installing & configuring Prometheus on Ubuntu server
+			
+	# sudo apt update
+
+	# sudo mkdir /etc/prometheus                    (To create the configuration directory)
+	
+	# sudo mkdir /var/lib/prometheus                (To create the data directory)
+	
+	# wget https://github.com/prometheus/prometheus/releases/download/v2.31.0/prometheus-2.31.0.linux-amd64.tar.gz 
+	
+	# tar xvf prometheus-2.31.0.linux-amd64.tar.gz
+	
+	# cd prometheus-2.31.0.linux-amd64
+	
+	# sudo mv prometheus promtool /usr/local/bin/
+	
+	# sudo mv consoles/ console_libraries/ /etc/prometheus/
+	
+	# sudo mv prometheus.yml /etc/prometheus/prometheus.yml
+	
+	# prometheus --version
+	
+		Output:
+	
+		promtool, version 2.31.3 (branch: HEAD, revision: f29caccc42557f6a8ec30ea9b3c8c089391bd5df)
+		build user: root@5cff4265f0e3
+		build date: 20211005-16:10:52
+		go version: go1.17.1
+		platform: linux/amd64
+
+	# sudo groupadd --system prometheus
+	
+	# sudo useradd -s /sbin/nologin --system -g prometheus prometheus
+	
+	$ sudo chown -R prometheus:prometheus /etc/prometheus/ /var/lib/prometheus/
+	
+	$ sudo chmod -R 775 /etc/prometheus/ /var/lib/prometheus/
+	
+	# sudo vim /etc/systemd/system/prometheus.service
+	
+		Paste the following lines of code.
+		
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Restart=always
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+	--config.file=/etc/prometheus/prometheus.yml \
+	--storage.tsdb.path=/var/lib/prometheus/ \
+	--web.console.templates=/etc/prometheus/consoles \
+	--web.console.libraries=/etc/prometheus/console_libraries \
+	--web.listen-address=0.0.0.0:9090
+    --storage.tsdb.retention.time=3d
+	
+[Install]
+WantedBy=multi-user.target
+
+	# sudo systemctl start prometheus
+	
+	# sudo systemctl enable prometheus
+	
+	# sudo systemctl status prometheus
+	
+	# sudo ufw allow 9090/tcp
+	
+	# sudo ufw reload
+	
+	# curl http://localhost:9090
+
+
+#################################################################################################################################################################	
+	
+			* Installation of Node Exporter
+			
+	
+	# sudo apt-get update
+	
+	# wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+	
+	# tar xzf node_exporter-1.3.1.linux-amd64.tar.gz
+	
+	# cd node_exporter-1.3.1.linux-amd64
+	
+	# cp node_exporter /usr/local/bin/
+	
+	# vi /etc/systemd/system/node-exporter.service
+	
+		Paste the following lines of code.
+		
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+		
+[Install]
+WantedBy=multi-user.target
+
+	# systemctl daemon-reload
+	
+	# systemctl start node-exporter.service
+	
+	# systemctl status node-exporter.service
+	
+	# curl http://localhost:9100
+	
+#############################################################################################################################################################	
+			* installation of redis exporter
+			
+	
+	# sudo apt-get update
+	
+	# wget https://github.com/oliver006/redis_exporter/releases/download/v1.18.0/redis_exporter-v1.18.0.linux-amd64.tar.gz
+	
+	# tar xvfz redis_exporter-v1.18.0.linux-amd64.tar.gz
+	
+	# cd redis_exporter-v1.18.0.linux-amd64
+	
+	# cp redis_exporter /usr/local/bin/
+	
+	# vi /etc/systemd/system/redis_exporter.service
+	
+		Paste the following lines of code.
+		
+[Unit]
+Description=Redis Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/redis_exporter \
+	-web.listen-address ":9121" \
+
+[Install]
+WantedBy=multi-user.target
+		
+	# systemctl daemon-relaod
+	
+	# systemctl restart redis_exporter
+	
+	# systemctl status redis_exporter
+	
+	# curl http://localhost:9121/metrics
+	
+#################################################################################################################################################################	
+			* installation of posrgres exporter for dockerisced postgres database			
+			
+	# 
+	
+	
+	
+##################################################################################################################################################################	
+
+
+	        * installation of Kafka exporter for dockerisced kafka
+			
+			
+	# docker pull danielqsj/kafka-exporter:latest
+	
+	# kafka_exporter --kafka.server=kafka:9092 [--kafka.server=another-server ...]
+	
+	docker run -d -p 9308:9308 danielqsj/kafka-exporter --kafka.server=kafka:9092 [--kafka.server=another-server ...]
+	
+	# docker run -d -p 9308:9308 danielqsj/kafka-exporter --kafka.server=172.28.25.144:1883 --kafka.server=172.28.25.144:18083 --kafka.server=172.28.25.144:9092  --topic.filter=.* --group.filter=.* --offset.show-all --concurrent.enable 
+	
+	# docker ps
+	
+	
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------	
+	
+		
+	
+		
+		# wget https://github.com/danielqsj/kafka_exporter/releases/download/v1.6.0/kafka_exporter-1.6.0.linux-amd64.tar.gz
+		
+		#  tar xvfz kafka_exporter-1.6.0.linux-amd64.tar.gz
+		
+		#  cp kafka_exporter /usr/local/bin/
+		
+		#  vi /etc/systemd/system/kafka_exporter.service
+		
+[Unit]
+Description=Kafka Exporter
+
+[Service]
+Type=simple
+User=prometheus
+#EnvironmentFile=/usr/local/bin/kafka_exporter
+ExecStart=/usr/local/bin/kafka_exporter
+OPTIONS=--kafka.server=172.28.25.144:9092 --kafka.server=172.28.25.144:8083 --kafka.server=172.28.25.144:9101 --topic.filter='.*' --group.filter=.* --offset.show-all=true --concurrent.enable
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+	OPTIONS="--kafka.server=172.28.25.144:9092 --topic.filter='.*' --group.filter=.* --offset.show-all=true --concurrent.enable"
+	
+	# systemctl daemon-relaod
+	
+	# systemctl restart kafka_exporter
+	
+	# systemctl status kafka_exporter
+	
+	# curl http://localhost:9308/metrics
+	
+##################################################################################################################################################################	
+	
+	                             *   installation of new relic agent 
+								 
+	vi dacker-compose.yml
+
+version: '3'
+
+services:
+  agent:
+    container_name: newrelic-infra
+    image: newrelic/infrastructure:latest
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - "/:/host:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      NRIA_LICENSE_KEY: "eu01xx6e883ea36e0e03eb4b860dd2d843e9NRAL"
+    restart: unless-stopped
+
+
+#################################################################################################################################################
+
