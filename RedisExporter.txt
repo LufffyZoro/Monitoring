@@ -1,0 +1,54 @@
+
+
+                                redis exporter
+
+
+wget https://github.com/oliver006/redis_exporter/releases/download/v1.18.0/redis_exporter-v1.18.0.linux-amd64.tar.gz
+tar xvfz redis_exporter-v1.18.0.linux-amd64.tar.gz
+cd redis_exporter-v1.18.0.linux-amd64
+
+$ cp redis_exporter /usr/local/bin/
+
+vi /etc/systemd/system/redis_exporter.service
+
+[Unit]
+Description=Redis Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/redis_exporter \
+    -web.listen-address ":9121" \
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+systemctl daemon-relaod
+
+$ systemctl restart redis_exporter
+$ curl http://localhost:9121/metrics
+
+13.234.142.189
+journalctl -u kafka_exporter.service -b
+7589
+172.28.25.32:19092
+
+docker run -ti --rm -p 9308:9308 danielqsj/kafka-exporter --kafka.server=kafka:9092 [--kafka.server=another-server ...]
+
+ docker run -ti --rm -p 9308:9308 danielqsj/kafka-exporter --kafka.server=connect:8083 --kafka.server=broker:9101 --kafka.server=172.28.25.32:19092 topic.filter.*
+
+ docker run -ti --rm -p 9308:9308 danielqsj/kafka-exporter --kafka.server=cokafka:8083 --kafka.server=broker:9101 --kafka.server=172.28.25.32:19092 --topic.filter=.*
+
+
+
+
+
+
+
+
+
