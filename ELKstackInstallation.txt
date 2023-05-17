@@ -1,0 +1,104 @@
+     How To Install Elasticsearch and Kibana (ELK Stack) on Ubuntu 20.04
+
+ sudo apt-get update 
+ java --vertion
+ sudo apt-get java 11 (from above comand)
+ curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - 
+ echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+ sudo apt update
+ sudo apt install elasticsearch
+ sudo vi /etc/elasticsearch/elasticsearch.yml
+
+  { EDIT-
+    Network.host: 0.0.0.0
+    http.port:9200
+    on last line type- discovery.type: single-node }
+
+ sudo systemctl start elasticsearch
+ sudo systemctl enable elasticsearch
+ curl -X GET "localhost:9200"
+ sudo apt install kibana
+ sudo vi /etc/kibana/kibana.yml
+
+ { uncoment srever port 
+   uncoment srevrhost & edit it to "0.0.0.0"
+   uncoment elasticsearch host
+   :wq    }
+
+ sudo systemctl enable kibana
+ sudo systemctl start kibana
+
+
+ 1) METRICBEAT
+
+ curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-8.0.1-amd64.deb
+ sudo dpkg -i metricbeat-8.0.1-amd64.deb
+ vi /etc/metricbeat/metricbeat.yml
+
+  { EDIT SECTION KIBANA
+    #host:"localhost:5601"
+    uncomment this line and edit host: "private ip of server:5601"
+
+    EDIT SECTIN ELASTIC.OUTPUT
+    host: "private ip of server:9200" }
+
+ metricbeat modules list
+ metricbeat modules enable nginx
+ metricbeat setup -e
+ sudo service metricbeat start
+ sudo service metricbeat status
+
+
+ 2) FILEBEAT
+
+ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.0.1-amd64.deb
+ sudo dpkg -i filebeat-8.0.1-amd64.deb
+ vi /etc/filebeat/filebeat.yml
+
+  { enabled: true
+
+    EDIT SECTION KIBANA
+    #host:"localhost:5601"
+    uncomment this line and edit host: "private ip of server:5601"
+
+    EDIT SECTIN ELASTIC.OUTPUT
+    host: "private ip of server:9200"
+
+    SECTION-FILEBEAT MODULE
+    reload enabled: true   }
+
+ apt-get install nginx
+ vi /etc/filebeat/modules.d/nginx.yml
+
+   { ["/var/log/nginx/access.log*"]  }
+
+ filebeat modules list
+ filebeat modules enable nginx
+ filebeat setup -e
+ sudo service filebeat start
+ sudo service filebeat status
+
+
+ 3) HEARTBEAT
+
+ curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-8.0.1-amd64.deb
+ sudo dpkg -i heartbeat-8.0.1-amd64.deb
+ vi /etc/heartbeat/heartbeat.yml
+
+  { HEARTBEAT MONITORS-
+    type:http
+    enabled: true
+    urls: ["https://www.facebook.com"]
+
+    EDIT SECTION KIBANA
+    #host:"localhost:5601"
+    uncomment this line and edit host: "private ip of server:5601"
+
+    EDIT SECTIN ELASTIC.OUTPUT
+    host: "private ip of server:9200" }
+
+ heartbeat setup -e
+ sudo service heartbeat-elastic start
+ sudo service heartbeat-elastic status
+
+
